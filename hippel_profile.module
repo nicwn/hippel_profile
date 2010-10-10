@@ -1,3 +1,89 @@
 <?php
 
 include_once('hippel_profile.features.inc');
+
+/**
+ * Implementation of hook_menu().
+ */
+function hippel_profile_menu() {
+  $items = array();
+  $items['account'] = array(
+    'title' => 'Account',
+    'page callback' => 'hippel_profile_account',
+    'access callback' => 'user_is_logged_in',
+    'weight' => -30,
+    'menu_name' => 'secondary-links',
+  );
+  $items['profile'] = array(
+    'title' => 'Profile',
+    'page callback' => 'hippel_profile_profile',
+    'access callback' => 'user_is_logged_in',
+    'weight' => -20,
+    'menu_name' => 'secondary-links',
+  );
+  $items['settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'hippel_profile_settings',
+    'access callback' => 'user_is_logged_in',
+    'weight' => -10,
+    'menu_name' => 'secondary-links',
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function hippel_profile_menu_alter(&$items) {
+  $items['user/%user/view']['title'] = t('Account');
+  $items['user/%user/view']['type'] = MENU_CALLBACK;
+  $items['user/%user_category/edit']['title'] = t('Settings');
+  $items['user/%user_category/edit']['type'] = MENU_CALLBACK;
+  if (module_exists('flag')) {
+    $items['user/%user/bookmarks']['type'] = MENU_CALLBACK;
+  }
+  if (module_exists('vud')) {
+    $items['user/%user/votes']['type'] = MENU_CALLBACK;
+  }
+}
+
+/**
+ * Profile settings page callback.
+ */
+function hippel_profile_account() {
+  return drupal_goto('user/'. $GLOBALS['user']->uid);
+}
+
+/**
+ * Profile settings page callback.
+ */
+function hippel_profile_profile() {
+  return drupal_goto('users/'. $GLOBALS['user']->uid);
+}
+
+/**
+ * Profile settings page callback.
+ */
+function hippel_profile_settings() {
+  return drupal_goto('user/'. $GLOBALS['user']->uid .'/edit');
+}
+
+/**
+  * Implementation of hook_form_alter.
+  */
+function hippel_profile_form_user_profile_form_alter(&$form, $form_state) {
+
+}
+
+/**
+ * Implementation of hook_profile_alter().
+ */
+function hippel_profile_profile_alter(&$account) {
+  $account->content['content_profile'] = NULL;
+  $account->content['public_profile_link']['#value'] = l('View your public profile', 'users/'. arg(1));
+  $account->content['user_picture']['#access'] = FALSE;
+  $account->content['summary']['#title'] = NULL;
+  $account->content['summary']['member_for']['#title'] = t('Joined');
+  $account->content['summary']['member_for']['#value'] = check_plain(strftime('%B %Y', $account->created));
+}

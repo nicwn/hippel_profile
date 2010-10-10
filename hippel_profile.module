@@ -14,13 +14,6 @@ function hippel_profile_menu() {
     'weight' => -30,
     'menu_name' => 'secondary-links',
   );
-  $items['profile'] = array(
-    'title' => 'Profile',
-    'page callback' => 'hippel_profile_profile',
-    'access callback' => 'user_is_logged_in',
-    'weight' => -20,
-    'menu_name' => 'secondary-links',
-  );
   $items['settings'] = array(
     'title' => 'Settings',
     'page callback' => 'hippel_profile_settings',
@@ -53,13 +46,6 @@ function hippel_profile_menu_alter(&$items) {
  */
 function hippel_profile_account() {
   return drupal_goto('user/'. $GLOBALS['user']->uid);
-}
-
-/**
- * Profile settings page callback.
- */
-function hippel_profile_profile() {
-  return drupal_goto('users/'. $GLOBALS['user']->uid);
 }
 
 /**
